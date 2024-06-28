@@ -1,0 +1,19 @@
+.cookie-clicker {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.cookie {
+  font-size: 100px;
+  cursor: pointer;
+  margin: 20px;
+  transition: transform 0.1s;
+}
+
+.cookie:hover {
+  transform: scale(1.1);
+}
+
+p {
+  font-size: 24px;
+}
