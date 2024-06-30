@@ -1,0 +1,26 @@
+[
+  {
+    "type": "autoClicker",
+    "baseCost": 10,
+    "costMultiplier": 1.15,
+    "cookiesPerSecond": 1
+  },
+  {
+    "type": "cookieOven",
+    "baseCost": 100,
+    "costMultiplier": 1.15,
+    "cookiesPerSecond": 10
+  },
+  {
+    "type": "cookiePrinter",
+    "baseCost": 250,
+    "costMultiplier": 1.15,
+    "cookiesPerSecond": 25
+  },
+  {
+    "type": "cookieCauldron",
+    "baseCost": 500,
+    "costMultiplier": 1.15,
+    "cookiesPerSecond": 50
+  }
+]

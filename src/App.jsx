@@ -1,162 +1,111 @@
 import { useState, useEffect } from "react";
 import "./assets/CookieClicker.css";
+import CookieDisplay from "./components/CookieDisplay.jsx";
+import CookieButton from "./components/CookieButton.jsx";
+import UpgradeList from "./components/UpgradeList.jsx";
+import Achievement from "./components/Achievement.jsx";
 
 const CookieClicker = () => {
-  const [count, setCount] = useState(0);
-  const [autoClickers, setAutoClickers] = useState(0);
-  const [cookieOvens, setCookieOvens] = useState(0);
-  const [cookiePrinters, setCookiePrinters] = useState(0);
-  const [cookieCauldrons, setCookieCauldrons] = useState(0);
+  const [upgrades, setUpgrades] = useState({});
+  const [shopData, setShopData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [cookiesPerClick, setCookiesPerClick] = useState(1);
 
-  const [autoClickerUnlocked, setAutoClickerUnlocked] = useState(false);
-  const [cookieOvenUnlocked, setCookieOvenUnlocked] = useState(false);
-  const [cookiePrinterUnlocked, setCookiePrinterUnlocked] = useState(false);
-  const [cookieCauldronUnlocked, setCookieCauldronUnlocked] = useState(false);
+  useEffect(() => {
+    fetch("./public/assets/Shop.json")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setShopData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching shop data:", error);
+        setLoading(false);
+      });
+  }, []);
 
-  const baseCosts = {
-    autoClicker: 10,
-    cookieOven: 100,
-    cookiePrinter: 250,
-    cookieCauldron: 500,
+  // Initialize count state based on cookiesPerSecond from owned upgrades
+  const [count, setCount] = useState(() => {
+    let initialCookies = 0;
+    Object.keys(upgrades).forEach((type) => {
+      const upgrade = shopData.find((item) => item.type === type);
+      if (upgrade) {
+        initialCookies += upgrades[type] * upgrade.cookiesPerSecond;
+      }
+    });
+    return initialCookies;
+  });
+
+  const calculateCost = (baseCost, costMultiplier, amountOwned) => {
+    return Math.floor(baseCost * Math.pow(costMultiplier, amountOwned));
   };
-
-  const calculateCost = (baseCost, amountOwned) => {
-    return Math.floor(baseCost * Math.pow(1.15, amountOwned));
-  };
-
-  const autoClickerCost = calculateCost(baseCosts.autoClicker, autoClickers);
-  const cookieOvenCost = calculateCost(baseCosts.cookieOven, cookieOvens);
-  const cookiePrinterCost = calculateCost(
-    baseCosts.cookiePrinter,
-    cookiePrinters
-  );
-  const cookieCauldronCost = calculateCost(
-    baseCosts.cookieCauldron,
-    cookieCauldrons
-  );
 
   const handleClick = () => {
-    setCount(count + 1);
+    setCount(count + cookiesPerClick); // Updated to use cookiesPerClick
   };
 
-  const handleBuyAutoClicker = () => {
-    if (count >= autoClickerCost) {
-      setCount(count - autoClickerCost);
-      setAutoClickers(autoClickers + 1);
+  const handleBuy = (type) => {
+    const upgrade = shopData.find((item) => item.type === type);
+    if (!upgrade) return;
+
+    const amountOwned = upgrades[type] || 0;
+    const cost = calculateCost(
+      upgrade.baseCost,
+      upgrade.costMultiplier,
+      amountOwned
+    );
+
+    if (count >= cost) {
+      setCount(count - cost);
+      setUpgrades((prev) => ({ ...prev, [type]: (prev[type] || 0) + 1 }));
+
+      // Check if the upgrade affects cookiesPerClick
+      if (upgrade.cookiesPerClick) {
+        setCookiesPerClick(cookiesPerClick + upgrade.cookiesPerClick);
+      }
     }
   };
 
-  const handleBuyCookieOven = () => {
-    if (count >= cookieOvenCost) {
-      setCount(count - cookieOvenCost);
-      setCookieOvens(cookieOvens + 1);
-    }
-  };
-
-  const handleBuyCookiePrinter = () => {
-    if (count >= cookiePrinterCost) {
-      setCount(count - cookiePrinterCost);
-      setCookiePrinters(cookiePrinters + 1);
-    }
-  };
-
-  const handleBuyCookieCauldron = () => {
-    if (count >= cookieCauldronCost) {
-      setCount(count - cookieCauldronCost);
-      setCookieCauldrons(cookieCauldrons + 1);
-    }
-  };
-
+  // useEffect to calculate and update CPS whenever upgrades or shopData change
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prevCount) => prevCount + autoClickers);
+    let cookiesPerSecond = 0;
+    shopData.forEach((item) => {
+      const amountOwned = upgrades[item.type] || 0;
+      cookiesPerSecond += amountOwned * item.cookiesPerSecond;
+    });
+
+    // Update count every second based on CPS
+    const cpsInterval = setInterval(() => {
+      setCount((prevCount) => prevCount + cookiesPerSecond);
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [autoClickers]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prevCount) => prevCount + cookieOvens * 10);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [cookieOvens]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prevCount) => prevCount + cookiePrinters * 25);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [cookiePrinters]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prevCount) => prevCount + cookieCauldrons * 50);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [cookieCauldrons]);
-
-  useEffect(() => {
-    if (count >= baseCosts.autoClicker) {
-      setAutoClickerUnlocked(true);
-    }
-    if (count >= baseCosts.cookieOven) {
-      setCookieOvenUnlocked(true);
-    }
-    if (count >= baseCosts.cookiePrinter) {
-      setCookiePrinterUnlocked(true);
-    }
-    if (count >= baseCosts.cookieCauldron) {
-      setCookieCauldronUnlocked(true);
-    }
-  }, [count]);
+    return () => clearInterval(cpsInterval); // Cleanup interval on unmount or change
+  }, [upgrades, shopData]);
 
   return (
     <div className="cookie-clicker">
-      <h1>Cookie Clicker</h1>
-      <div className="cookie" onClick={handleClick}>
-        🍪
-      </div>
-      <p>Cookies: {count}</p>
-
-      {autoClickerUnlocked && (
-        <>
-          <button onClick={handleBuyAutoClicker}>
-            Buy Auto Clicker ({autoClickerCost} Cookies)
-          </button>
-          <p>Auto Clickers: {autoClickers}</p>
-        </>
+      <h1>The Cookiest of Clickers</h1>
+      <CookieButton onClick={handleClick} />
+      <CookieDisplay count={count} />
+      {!loading && (
+        <UpgradeList
+          count={count}
+          upgrades={upgrades}
+          shopData={shopData}
+          calculateCost={calculateCost}
+          handleBuy={handleBuy}
+        />
       )}
-
-      {cookieOvenUnlocked && (
-        <>
-          <button onClick={handleBuyCookieOven}>
-            Buy Cookie Oven ({cookieOvenCost} Cookies)
-          </button>
-          <p>Cookie Ovens: {cookieOvens}</p>
-        </>
-      )}
-
-      {cookiePrinterUnlocked && (
-        <>
-          <button onClick={handleBuyCookiePrinter}>
-            Buy Cookie Printer ({cookiePrinterCost} Cookies)
-          </button>
-          <p>Cookie Printers: {cookiePrinters}</p>
-        </>
-      )}
-
-      {cookieCauldronUnlocked && (
-        <>
-          <button onClick={handleBuyCookieCauldron}>
-            Buy Cookie Cauldron ({cookieCauldronCost} Cookies)
-          </button>
-          <p>Cookie Cauldrons: {cookieCauldrons}</p>
-        </>
-      )}
+      <Achievement
+        count={count}
+        cookiesPerClick={cookiesPerClick}
+        setCookiesPerClick={setCookiesPerClick}
+      />
     </div>
   );
 };
