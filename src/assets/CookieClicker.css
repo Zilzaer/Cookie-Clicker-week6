@@ -31,36 +31,4 @@ h3 {
   color: #964B00;
 }
 
-@media only screen and (min-width: 1000px) {
-
-  .title {
-    font-size: 42px;
-  }
   
-  p {
-    font-size: 34px;
-    
-  }
-
-  h3 {
-    font-size: 42px;
-  }
-
-  .logo-design {
-    display: flex;
-    position: absolute;
-    left: 50px; 
-    
-
-  }
-
-  h1 {
-    display: flex;
-    position: absolute;
-    top: 0;
-    left: 230px;
-    
-  }
-
-
-}
