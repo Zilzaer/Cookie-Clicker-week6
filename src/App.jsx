@@ -68,7 +68,7 @@ const CookieClicker = () => {
       if (upgrade.cookiesPerClick) {
         setCookiesPerClick(cookiesPerClick + upgrade.cookiesPerClick);
       }
-    }
+    }  //orginally planned to have some upgrades also only affect "clicking power" but i scaled back as i didn't want to do too much more before tackling design
   };
 
   // useEffect to calculate and update CPS whenever upgrades or shopData change
@@ -84,12 +84,13 @@ const CookieClicker = () => {
       setCount((prevCount) => prevCount + cookiesPerSecond);
     }, 1000);
 
-    return () => clearInterval(cpsInterval); // Cleanup interval on unmount or change
+    return () => clearInterval(cpsInterval); // Cleanup interval on change or unmount
   }, [upgrades, shopData]);
 
   return (
     <div className="cookie-clicker">
-      <h1>The Cookiest of Clickers</h1>
+      <img className="logo-design" src="./src/assets/Cookie-Crunchers-Logo.png" alt="Cookie Crunchers Logo" />
+      <h1 className="title">The Crunchiest Clicker in the West</h1>
       <CookieButton onClick={handleClick} />
       <CookieDisplay count={count} />
       {!loading && (

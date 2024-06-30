@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import "../assets/Button.css";
 
 const UpgradeButton = ({ name, cost, amount, onClick, disabled }) => {
   return (
