@@ -89,7 +89,7 @@ const CookieClicker = () => {
 
   return (
     <div className="cookie-clicker">
-      <img className="logo-design" src="./src/assets/Cookie-Crunchers-Logo.png" alt="Cookie Crunchers Logo" />
+      <img className="logo-design" src="./assets/Cookie-Crunchers-Logo.png" alt="Cookie Crunchers Logo" />
       <h1 className="title">The Crunchiest Clicker in the West</h1>
       <CookieButton onClick={handleClick} />
       <CookieDisplay count={count} />
