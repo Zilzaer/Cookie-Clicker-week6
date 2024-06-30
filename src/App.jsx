@@ -12,7 +12,7 @@ const CookieClicker = () => {
   const [cookiesPerClick, setCookiesPerClick] = useState(1);
 
   useEffect(() => {
-    fetch("./public/assets/Shop.json")
+    fetch("./assets/Shop.json")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
